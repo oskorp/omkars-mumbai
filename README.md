@@ -1,7 +1,9 @@
 # Omkar's Mumbai
 
-A 3D playable portfolio of Omkar Khandalkar, product designer from Mumbai. Play as Omkar, climb the design system, the stock chart and the skill stack to recover 7 case studies, then walk through the Gateway of India.
+A 3D playable portfolio of Omkar Khandalkar, product designer from Mumbai. Play as Omkar, follow the marker to recover 7 case studies, ride the kaali-peeli taxi or the bike, fix bugs by jumping on them, and beat Scope Creep at the Gateway of India.
 
 **Play:** https://oskorp.github.io/omkars-mumbai/
 
-Built with Three.js in a single HTML file. Controls: WASD to move, Space to jump, Shift to sprint, E to interact, drag to look, Q for the résumé view. Touch controls on phones.
+Built with Three.js (r128) in a single HTML file: day/night cycle, bloom, synthesised sound effects and music.
+
+Controls: WASD to move or drive, Space to jump (drift when driving), Shift to sprint (boost), E to read, F to get in or out of a vehicle, H for the horn, N for day/night, Esc for the menu. Touch controls on phones.
