@@ -67,6 +67,13 @@ kbd{font:500 11px var(--f-mono);color:var(--ink);background:var(--night-2);borde
 .chip:hover{border-color:var(--rick)}
 .chip.off{opacity:.5;text-decoration:line-through}
 
+#talk{left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 32px));pointer-events:auto;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:14px 16px 12px;border-radius:18px;border:2px solid var(--npc,var(--rick));animation:tin .3s cubic-bezier(.2,1.4,.4,1) both}
+#talk .av{width:52px;height:52px;border-radius:50%;background:var(--npc,var(--rick));display:grid;place-items:center;font:800 22px var(--f-display);color:#13102a;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
+#talk .nm{font:800 15px var(--f-display);color:var(--npc,var(--rick))}
+#talk .rl{font:500 11px var(--f-mono);letter-spacing:.06em;color:var(--muted);margin:2px 0 8px}
+#talk .tx{font-size:16px;line-height:1.5;min-height:48px;color:var(--ink)}
+#talk .ft{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}
+#talk .dots{display:flex;gap:5px}#talk .dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}#talk .dots i.on{background:var(--npc,var(--rick))}
 #prompt{left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:6px;justify-items:center}
 .pr{background:var(--rick);color:#1a1400;border-radius:999px;padding:8px 16px 8px 8px;font:800 14px var(--f-body);display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(255,210,63,.35);white-space:nowrap;border:0}
 .pr kbd{background:#1a1400;color:var(--rick);border:0;border-radius:8px;padding:4px 9px;font-size:12px}
@@ -152,7 +159,7 @@ kbd{font:500 11px var(--f-mono);color:var(--ink);background:var(--night-2);borde
 .start-card h1 em{font-style:normal;color:var(--rick)}
 .lede{font-size:16px;line-height:1.55;color:var(--muted);margin:14px 0 16px;max-width:48ch}
 .lede b{color:var(--ink)}
-.how{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.how{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .how div{background:var(--night-2);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:13px;line-height:1.4;color:var(--muted)}
 .how b{display:block;color:var(--ink);font:800 13px var(--f-display);margin-bottom:4px}
 .how i{font-style:normal;font:800 22px var(--f-display);color:var(--rick);display:block;margin-bottom:2px}
@@ -173,6 +180,7 @@ kbd{font:500 11px var(--f-mono);color:var(--ink);background:var(--night-2);borde
 #tboost{right:max(30px,env(safe-area-inset-right,0px));bottom:calc(190px + env(safe-area-inset-bottom,0px));width:58px;height:58px;color:var(--saffron)}
 body.touch #hint{bottom:calc(220px + env(safe-area-inset-bottom,0px))}
 body.touch #drive{bottom:calc(260px + env(safe-area-inset-bottom,0px))}
+body.touch #talk{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 
 @media (max-width:1040px){
@@ -194,14 +202,14 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
 </style>
+
 </head>
 <body>
-
 <canvas id="c" tabindex="0" aria-label="3D game world"></canvas>
 
 <div class="hud panel" id="who" hidden>
   <img src="omkar.jpg" alt="">
-  <div><div class="nm">OMKAR</div><div id="hearts"></div><div class="wstat">Bugs fixed <b id="bugs">0</b> · Pixels <b id="pix">0</b> · <b id="clock">0:00</b></div></div>
+  <div><div class="nm">OMKAR</div><div id="hearts"></div><div class="wstat">Bugs <b id="bugs">0</b> · Pixels <b id="pix">0</b> · Chats <b id="chats">0</b> · <b id="clock">0:00</b></div></div>
 </div>
 <div class="hud panel" id="obj" hidden>
   <div class="lab"><span id="objLab">Objective</span><button id="skip" hidden>Skip tutorial</button></div>
@@ -221,6 +229,7 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 </div>
 <div class="hud" id="toasts"></div>
 <div class="hud" id="prompt"></div>
+<div class="hud panel" id="talk" hidden role="dialog" aria-live="polite"><div class="av" id="tAv"></div><div><div class="nm" id="tNm"></div><div class="rl" id="tRl"></div><div class="tx" id="tTx"></div><div class="ft"><div class="dots" id="tDots"></div><span><kbd>E</kbd> / tap next · <kbd>Esc</kbd> leave</span></div></div></div>
 <div class="hud panel" id="drive" hidden>
   <div class="spd"><span id="kmh">0</span><small>KM/H</small></div>
   <div id="boostbar"><i id="boostFill"></i></div>
@@ -239,10 +248,11 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
       <p class="lede">Play as <b>Omkar Khandalkar</b>, product designer. His 7 case studies are scattered across the island. Get them back, squash the bugs, and beat <b>Scope Creep</b> at the Gateway of India.</p>
       <div class="how">
         <div><i>1</i><b>Follow the marker</b>The yellow diamond always shows where to go next.</div>
-        <div><i>2</i><b>Read & collect</b>Press E in glowing rings. Climb up to the crystals.</div>
-        <div><i>3</i><b>Drive & stomp</b>Take the taxi or the bike. Jump on bugs to fix them.</div>
+        <div><i>2</i><b>Lift up</b>Step on the glowing pad under a crystal. You fly straight to it.</div>
+        <div><i>3</i><b>Talk to people</b>Anyone with a speech bubble has a story about Omkar. Press E.</div>
+        <div><i>4</i><b>Drive & stomp</b>Take the taxi or the bike. Jump on bugs to fix them.</div>
       </div>
-      <div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Space</kbd> jump</span><span><kbd>Shift</kbd> sprint</span><span><kbd>E</kbd> read</span><span><kbd>F</kbd> drive</span><span><kbd>Drag</kbd> look</span><span><kbd>Esc</kbd> menu</span></div>
+      <div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Space</kbd> jump</span><span><kbd>Shift</kbd> sprint</span><span><kbd>E</kbd> talk / read</span><span><kbd>F</kbd> drive</span><span><kbd>Drag</kbd> look</span><span><kbd>Esc</kbd> menu</span></div>
       <div class="cta">
         <button class="play" id="bPlay">Play as Omkar</button>
         <button class="alt" id="bQuick">Just show me the résumé</button>
@@ -274,7 +284,7 @@ const COYOTE = 0.1, JUMP_BUFFER = 0.13, PLAYER_R = 0.45, PLAYER_H = 1.9;
 const ISLAND_R = 62, BEACH_R = 67;
 const ISLET = { x:91, z:-2, r:7 };
 const DAY_LENGTH = 300;          // seconds for a full day/night cycle
-const MAX_HEARTS = 3;
+const MAX_HEARTS = 5;
 const IS_TOUCH = matchMedia('(pointer:coarse)').matches;
 
 /* ======================= CONTENT ======================= */
@@ -384,7 +394,7 @@ const state = {
   got:new Set(), pixels:new Set(), visited:new Set(),
   time:0, boost:0, sound:true, music:true, best:null,
   hearts:MAX_HEARTS, bugsFixed:0, stunts:0, hurtCount:0,
-  tut:0, dayT:0.42, driving:null, bossDown:false, quality: IS_TOUCH ? 'low' : 'high'
+  tut:0, dayT:0.42, driving:null, bossDown:false, talking:null, chats:0, lifted:false, quality: IS_TOUCH ? 'low' : 'high'
 };
 try { const b = localStorage.getItem('omkar-best'); if (b) state.best = +b; } catch(e){}
 try { if (localStorage.getItem('omkar-tut') === 'done') state.tut = 4; } catch(e){}
@@ -445,6 +455,9 @@ const sfx = {
   chai(){ tone(330, .1, 'sine', .06, 200); noise(.3, .03, 3000, 'highpass', .05); },
   tick(){ tone(1200, .03, 'square', .02); }
 };
+sfx.blip = p => tone(p * (.92 + Math.random() * .16), .045, 'triangle', .035);
+sfx.lift = () => { tone(260, .7, 'sine', .07, 900); noise(.8, .06, 600, 'bandpass', 0, 3000); tone(520, .3, 'triangle', .04, 400, .5); };
+sfx.hello = p => { tone(p, .09, 'triangle', .05, p * .3); tone(p * 1.5, .12, 'triangle', .05, 0, .1); };
 let engine = null;
 function startEngine(bike){
   if (!ac || engine) return;
@@ -1103,6 +1116,176 @@ function buildOmkar(){
 }
 const omkar = buildOmkar(); scene.add(omkar.root);
 
+/* ======================= FREE-SPOT FINDER ======================= */
+function freeSpot(x, z, prefer, minR=0, used=[]){
+  const ok = (px, pz) => { const g = groundAt(px, pz); if (g < 0 || g > .05) return false;
+    if (colliders.some(b => b.y0 < 2.2 && px > b.x0 - 1.1 && px < b.x1 + 1.1 && pz > b.z0 - 1.1 && pz < b.z1 + 1.1)) return false;
+    if (ZONE_SPOTS.some(([zx, zz, zr]) => Math.hypot(px - zx, pz - zz) < zr + 1)) return false;
+    if (Math.abs(Math.hypot(px, pz) - 26) < 2.6) return false;          // keep off the ring road
+    return !used.some(([ux, uz]) => Math.hypot(px - ux, pz - uz) < 3); };
+  for (let r = minR; r < 16; r += .75){
+    const n = Math.max(1, Math.round(r * 3));
+    const cands = Array.from({ length:n }, (_, i) => prefer + (i % 2 ? 1 : -1) * Math.ceil(i / 2) * (Math.PI * 2 / n));
+    for (const a of cands){ const px = x + Math.sin(a) * r, pz = z + Math.cos(a) * r; if (ok(px, pz)) return [px, pz]; }
+  }
+  return [x, z];
+}
+const ZONE_SPOTS = [[0,-1,3.6],[ZEUS.x + 1.5, ZEUS.z + 6.5, 3.2],[-34,28,3.6],[-41.5,-4,4],[43.5,-10,3.2],[SK.x - 5, SK.z - 4, 3.2],[12,11.8,2.6],[-20,46.6,2.6],[GATE.x, GATE.z - 3.4, 3]];
+
+/* ======================= LIFT PADS (one under every crystal) ======================= */
+const ARROW_TEX = canvasTex(128, 128, g => { g.strokeStyle = '#fff'; g.lineWidth = 12; g.lineCap = 'round'; g.lineJoin = 'round';
+  [[34],[64],[94]].forEach(([y]) => { g.beginPath(); g.moveTo(34, y + 14); g.lineTo(64, y - 14); g.lineTo(94, y + 14); g.stroke(); }); });
+const LIFT_GEO = new THREE.CylinderGeometry(.9, .9, 4, 20, 1, true);
+const lifts = CASES.map(c => {
+  const [gx, gy, gz] = CASE_POS[c.id], [x, z] = freeSpot(gx, gz, Math.atan2(-gx, -gz), c.id === 'assure' ? 2 : 3);
+  const cc = col(c.color), g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+  mesh(new THREE.CylinderGeometry(1.25, 1.35, .14, 28), smooth(0x1f1a45), 0, .07, 0, g);
+  const pad = mesh(new THREE.CircleGeometry(1.05, 28), new THREE.MeshBasicMaterial({ color:cc }), 0, .15, 0, g); pad.rotation.x = -Math.PI/2;
+  const arr = mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map:ARROW_TEX, transparent:true, depthWrite:false, color:0x13102a }), 0, .16, 0, g); arr.rotation.x = -Math.PI/2;
+  const col2 = new THREE.Mesh(LIFT_GEO, new THREE.MeshBasicMaterial({ color:cc, transparent:true, opacity:.22, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
+  col2.position.y = 2; g.add(col2);
+  const lab = labelSprite('LIFT', { size:2.3, sub:c.name.split(' ')[0], accent:c.color }); lab.position.y = 3.2; g.add(lab);
+  return { c, g, x, z, arr, col:col2, lab, cool:0 };
+});
+const fly = { on:false, t:0, dur:1.3, a:new THREE.Vector3(), b:new THREE.Vector3(), ctl:new THREE.Vector3() };
+function startLift(L){
+  const gem = gems.find(g => g.c === L.c); if (!gem) return;
+  fly.on = true; fly.t = 0; fly.a.copy(P.pos); fly.b.copy(gem.m.position).y -= .9;
+  fly.dur = 1 + Math.min(1, fly.b.y / 25);
+  fly.ctl.set((fly.a.x + fly.b.x) / 2, Math.max(fly.a.y, fly.b.y) + 5, (fly.a.z + fly.b.z) / 2);
+  P.vel.set(0, 0, 0); P.grounded = false; L.cool = 3; sfx.lift(); shake = .15;
+  burst(L.x, .4, L.z, L.c.color, 30, 4, 7);
+  if (!state.lifted){ state.lifted = true; toast('Omkiii lift!', 'Lift pads fly you straight to the crystal'); }
+}
+
+/* ======================= PEOPLE OF THE ISLAND ======================= */
+// Fictional islanders. Everything they say comes from Omkar's résumé and his website.
+const NPCS = [
+  { name:'Tara', role:'Island guide', g:'f', at:[-3.5, 7.5], skin:0xc68e64, hair:0x2a1a12, style:'pony', top:0x38c6cc, bot:0x2c3446, skirt:false, pitch:620,
+    lines:['Hi! Welcome to Omkar\'s Mumbai. Everything on this island is a piece of Omkar\'s story.',
+      'Follow the yellow diamond. It always points to your next goal.',
+      'Crystals are his case studies. Step on the glowing LIFT pad under one and Omkiii flies you up to it.',
+      'People with a speech bubble know Omkar. Walk up and press E to chat, just like now.',
+      'Red bugs only chase you if you get close. Jump on top of them. Lost hearts? Grab a chai.'] },
+  { name:'Priya', role:'Frontend developer · Zeus Learning', g:'f', at:[-21, -13], skin:0xa66e4a, hair:0x150d09, style:'long', top:0xffd23f, bot:0x3b4a6b, skirt:false, pitch:660, glasses:true,
+    lines:['I build the screens Omkar designs. He has been at Zeus Learning since August 2023, now as Senior UI/UX Designer.',
+      'He is the primary designer on Quantum, a live LMS and CMS for students, teachers and admins.',
+      'He works with 35+ developers and 8 QA engineers on sprint planning, priorities and breaking down tasks.',
+      'His implementation audits cut UI inconsistencies by 40%. What ships matches the Figma, down to the pixel.'] },
+  { name:'Arjun', role:'Teacher · uses Quantum LMS', g:'m', at:[-35, -15], skin:0x8b5a3c, hair:0x1a120e, style:'short', top:0xf2efe6, bot:0x5b4636, pitch:300,
+    lines:['Grading open-ended answers used to eat my whole weekend.',
+      'Omkar designed an AI-assisted evaluation flow. The AI suggests feedback in context and the teacher makes the final call.',
+      'It cut the estimated manual evaluation effort by 60%, and it shipped in the live product.',
+      'He also kept the dashboards, gradebook and calendar to WCAG 2.2 accessibility standards, on desktop and tablet.'] },
+  { name:'Sneha', role:'Junior designer · mentored by Omkar', g:'f', at:[-16, -27], skin:0xd9a47c, hair:0x3a2519, style:'bun', top:0xff7ab8, bot:0x2c3446, skirt:true, pitch:700,
+    lines:['Omkar mentors three of us junior designers.',
+      'He taught us visual craft, how to document components, and how to hand off cleanly to developers.',
+      'Design-to-development efficiency across the team went up 30%.',
+      'And he built the Figma design system we all use: 80+ components on Angular Material, with token-based themes.'] },
+  { name:'Rohan', role:'Fellow intern, 2023', g:'m', at:[13, -32], skin:0xb07a52, hair:0x0f0b08, style:'buzz', top:0x5be08a, bot:0x2c3446, pitch:340,
+    lines:['Omkar and I interned together in Mumbai, from January to April 2023, at Organic Signal Media Services.',
+      'He was the UX Designer Intern. He designed interfaces and flows, and used information architecture to structure content and navigation.',
+      'He built clickable Figma prototypes and sat with developers so the build matched the design.',
+      'What stood out to me: he always explained why. Every design decision came with its reasoning at handoff.'] },
+  { name:'Vikram', role:'Engineer · MAI Labs project', g:'m', at:[24, 16], skin:0x9a6644, hair:0x1d1410, style:'curly', top:0x9d8cff, bot:0x2b2a33, pitch:280, glasses:true,
+    lines:['Right after the internship, June to August 2023, Omkar was a UI Developer consultant for MAI Labs.',
+      'He did not stop at the design. He built the company website himself, in Next.js and Tailwind.',
+      'Lighthouse performance went from 41 to 94, and accessibility scored 100.',
+      'His stack is right behind me: Figma, research, prototyping, React, Tailwind and more.'] },
+  { name:'Isha', role:'First-time investor', g:'f', at:[30, -20], skin:0xc08560, hair:0x22150e, style:'long', top:0x5be08a, bot:0xf2efe6, skirt:true, pitch:640,
+    lines:['Investing apps used to scare me. Too many numbers, and no idea why they told me to buy.',
+      'Omkar\'s Clio concept explains every AI recommendation in plain language.',
+      'He matched AI confidence levels to different UI treatments, so a shaky guess never looks like an order.',
+      'In testing, decisions got 3x faster and task completion went from 54% to 89%. His crystal is on top of the chart.'] },
+  { name:'Ananya', role:'Student · CodeOS bootcamp', g:'f', at:[-37, 3], skin:0x9e6a46, hair:0x120c08, style:'pony', top:0xff8a3d, bot:0x2c3446, pitch:720,
+    lines:['I learned to code at a CodeOS bootcamp!',
+      'Omkar founded CodeOS, an edtech initiative that runs skill-development bootcamps for underserved students. He ran it from 2021 to 2024.',
+      'Hundreds of students like me were mentored through those workshops.',
+      'He also hosts the CodeOS podcast. Go and listen at the studio on the east side!'] },
+  { name:'Kabir', role:'Volunteer · Kotak Education Foundation', g:'m', at:[-38, -13], skin:0xb98a64, hair:0x2a1a12, style:'short', top:0x38c6cc, bot:0x3b4a6b, pitch:320,
+    lines:['I volunteer with the Kotak Education Foundation, and so does Omkar.',
+      'Since 2022 he has run CSR mentoring sessions and workshops for students with Kotak and RAIT.',
+      'He gives his weekends to teaching. That is a big part of who he is.'] },
+  { name:'Meera', role:'Student at RAIT', g:'f', at:[-26, 22], skin:0xd09a70, hair:0x1a120e, style:'bun', top:0x9d8cff, bot:0x2c3446, skirt:true, pitch:680, glasses:true,
+    lines:['Omkar studied Electronics and Telecommunication here at RAIT, from 2019 to 2023.',
+      'He was Vice Chairman of IETE RAIT. He organised the Internal Smart India Hackathon and ran Python and Java workshops.',
+      'He represented the college at eYantra, the national robotics competition, and reached the finals.',
+      'Later he came back as a judge at the DYP RAIT Design Hackathon. Students here still talk about it.'] },
+  { name:'Dev', role:'Podcast listener', g:'m', at:[39, -4], skin:0x8f5e3e, hair:0x0f0b08, style:'curly', top:0xff5d5d, bot:0x2c3446, pitch:260,
+    lines:['I never miss an episode! Omkar hosts the CodeOS podcast. He has recorded a whole stack of episodes, and they have a lot of views on YouTube.',
+      'He vlogs too, like his Nashik trip. And he shoots photos: sunsets, macro, wildlife, street.',
+      'Try the photo point near the Gateway and take a selfie with him.'] },
+  { name:'Zoya', role:'Accessibility tester', g:'f', at:[37, 28], skin:0xe0b08a, hair:0x4a2c1a, style:'long', top:0x38c6cc, bot:0x2b2a33, skirt:false, pitch:600,
+    lines:['I use a screen reader, so accessibility is personal for me.',
+      'Omkar designs to WCAG 2.2, with accessibility-first components and ARIA patterns.',
+      'He built AccessIQ, which turns hard-to-read WCAG audits into plain action plans for designers and developers.',
+      'As he puts it, accessibility is mostly a communication problem. That crystal sits on top of the skill stack.'] },
+];
+
+function buildPerson(o){
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const skin = smooth(o.skin, { roughness:.6 }), hairM = smooth(o.hair, { roughness:.95 }), top = smooth(o.top, { roughness:.8 }), bot = smooth(o.bot, { roughness:.85 });
+  const shoe = smooth(o.g === 'f' ? 0xfaf6ee : 0x2a2a2a), f = o.g === 'f';
+  const leg = sx => { const g = new THREE.Group(); g.position.set(sx, .72, 0); body.add(g);
+    mesh(new THREE.CylinderGeometry(.12, .11, .64, 10), o.skirt ? skin : bot, 0, -.32, 0, g);
+    const s = mesh(new THREE.SphereGeometry(.14, 10, 8), shoe, 0, -.66, .05, g); s.scale.set(1, .6, 1.4); return g; };
+  const legL = leg(.13), legR = leg(-.13);
+  if (o.skirt){ const sk = mesh(new THREE.CylinderGeometry(.3, .44, .5, 18), bot, 0, .66, 0, body); sk.scale.z = .8; }
+  else mesh(new THREE.CylinderGeometry(.29, .27, .2, 14), bot, 0, .74, 0, body).scale.z = .72;
+  const torso = new THREE.Group(); torso.position.y = .8; body.add(torso);
+  mesh(new THREE.CylinderGeometry(f ? .3 : .34, f ? .28 : .3, .66, 16), top, 0, .34, 0, torso).scale.z = .7;
+  mesh(new THREE.SphereGeometry(f ? .3 : .34, 16, 8, 0, Math.PI*2, 0, Math.PI/2), top, 0, .66, 0, torso).scale.set(1, .35, .7);
+  mesh(new THREE.CylinderGeometry(.09, .1, .14, 10), skin, 0, .74, 0, torso);
+  const arm = sx => { const g = new THREE.Group(); g.position.set(sx * (f ? .36 : .39), 1.42, 0); body.add(g);
+    mesh(new THREE.CylinderGeometry(.1, .09, .3, 10), top, 0, -.12, 0, g);
+    mesh(new THREE.CylinderGeometry(.08, .07, .3, 10), skin, 0, -.4, 0, g);
+    mesh(new THREE.SphereGeometry(.085, 10, 8), skin, 0, -.58, 0, g); return g; };
+  const armL = arm(1), armR = arm(-1);
+  const head = new THREE.Group(); head.position.set(0, 1.96, 0); body.add(head);
+  mesh(new THREE.SphereGeometry(.4, 24, 18), skin, 0, 0, 0, head).scale.set(.95, 1.02, .95);
+  [1, -1].forEach(s => mesh(new THREE.SphereGeometry(.075, 10, 8), skin, s * .37, -.02, -.02, head).scale.set(.6, 1, .9));
+  const eyes = [];
+  [1, -1].forEach(s => {
+    const w = mesh(new THREE.SphereGeometry(.055, 12, 8), smooth(0xffffff), s * .13, .02, .34, head); w.scale.set(1.1, .7, .5); w.userData.sy = .7;
+    const ir = mesh(new THREE.SphereGeometry(.035, 10, 8), smooth(0x24150f), s * .13, .02, .365, head); ir.scale.set(1, .85, .5); ir.userData.sy = .85;
+    eyes.push(w, ir);
+    mesh(new THREE.BoxGeometry(.12, .025, .03), hairM, s * .13, .12, .35, head).rotation.z = s * -.1;
+    if (f) mesh(new THREE.SphereGeometry(.05, 8, 6), smooth(0xff8a8a, { transparent:true, opacity:.35 }), s * .21, -.1, .32, head).scale.set(1, .6, .4);
+  });
+  const mouth = mesh(new THREE.TorusGeometry(.08, .017, 6, 14, Math.PI), smooth(0x5a1f1a), 0, -.15, .37, head); mouth.rotation.z = Math.PI;
+  if (o.glasses){ const fr = smooth(0x2b2a33, { metalness:.5, roughness:.4 });
+    [1, -1].forEach(s => mesh(new THREE.TorusGeometry(.09, .012, 5, 16), fr, s * .13, .02, .39, head));
+    mesh(new THREE.BoxGeometry(.06, .012, .012), fr, 0, .04, .4, head); }
+  // hair
+  const cap = mesh(new THREE.SphereGeometry(.42, 22, 14, 0, Math.PI * 2, 0, Math.PI * .52), hairM, 0, .04, -.03, head); cap.rotation.x = -.3;
+  if (o.style === 'buzz') cap.scale.set(.98, .9, .98);
+  if (o.style === 'curly'){ const cg = new THREE.IcosahedronGeometry(1, 1); for (let i = 0; i < 40; i++){ const a = i * 2.4, y = .12 + (i % 5) * .07; const r = Math.sqrt(Math.max(0, .45 * .45 - (y - .05) ** 2));
+    const z = Math.sin(a) * r; if (z > .25 && y < .3) continue; const m = mesh(cg, hairM, Math.cos(a) * r, y, z - .02, head); m.scale.setScalar(.09); m.castShadow = false; } }
+  if (o.style === 'long' || o.style === 'pony' || o.style === 'bun'){
+    if (o.style === 'long'){ const b = mesh(new THREE.CylinderGeometry(.4, .44, .75, 18, 1, true, Math.PI * .3, Math.PI * 1.4), hairM, 0, -.22, -.02, head); b.material.side = THREE.DoubleSide; }
+    if (o.style === 'pony'){ mesh(new THREE.SphereGeometry(.12, 10, 8), hairM, 0, .1, -.42, head); const t = mesh(new THREE.CylinderGeometry(.1, .04, .55, 10), hairM, 0, -.2, -.5, head); t.rotation.x = .35; }
+    if (o.style === 'bun') mesh(new THREE.SphereGeometry(.17, 14, 10), hairM, 0, .42, -.18, head);
+    [1, -1].forEach(s => mesh(new THREE.SphereGeometry(.16, 12, 8), hairM, s * .26, .2, .2, head).scale.set(1, .6, .8));   // fringe
+  }
+  const tag = labelSprite(o.name.toUpperCase(), { size:1.25, accent:'#' + o.top.toString(16).padStart(6, '0') }); tag.position.y = 2.75; root.add(tag);
+  return { root, body, legL, legR, armL, armR, head, eyes, mouth };
+}
+const BUBBLE_TEX = canvasTex(128, 112, g => { g.fillStyle = '#fff'; roundRect(g, 6, 6, 116, 76, 26); g.fill(); g.beginPath(); g.moveTo(40, 78); g.lineTo(34, 106); g.lineTo(66, 80); g.fill();
+  g.fillStyle = '#13102a'; [38, 64, 90].forEach(x => { g.beginPath(); g.arc(x, 44, 9, 0, 7); g.fill(); }); });
+const DONE_TEX = canvasTex(128, 112, g => { g.fillStyle = '#5be08a'; roundRect(g, 6, 6, 116, 76, 26); g.fill(); g.beginPath(); g.moveTo(40, 78); g.lineTo(34, 106); g.lineTo(66, 80); g.fill();
+  g.strokeStyle = '#13102a'; g.lineWidth = 12; g.lineCap = 'round'; g.beginPath(); g.moveTo(44, 44); g.lineTo(58, 58); g.lineTo(86, 28); g.stroke(); });
+const usedSpots = lifts.map(l => [l.x, l.z]);
+const people = NPCS.map(o => {
+  const [x, z] = freeSpot(o.at[0], o.at[1], 0, 0, usedSpots); usedSpots.push([x, z]);
+  const m = buildPerson(o); m.root.position.set(x, 0, z); scene.add(m.root);
+  const bub = new THREE.Sprite(new THREE.SpriteMaterial({ map:BUBBLE_TEX, transparent:true, depthWrite:false, fog:false })); bub.scale.set(.9, .8, 1); bub.position.y = 3.35; m.root.add(bub);
+  const h = Math.atan2(-x, -z);
+  m.root.rotation.y = h;
+  return { o, m, bub, home:new THREE.Vector3(x, 0, z), pos:new THREE.Vector3(x, 0, z), h, baseH:h, talked:false, phase:rnd() * 6, wander:new THREE.Vector3(x, 0, z), wt:rnd() * 4, step:0, talkAnim:0 };
+});
+const TALK_R = 2.6;
+
+
 // Omkiii, the AI sidekick drone from his site
 const drone = new THREE.Group(); scene.add(drone);
 mesh(new THREE.SphereGeometry(.28, 16, 12), smooth(0xf2f0fb, { roughness:.3 }), 0, 0, 0, drone);
@@ -1291,13 +1474,13 @@ class Bug {
     if (this.state === 'wander'){
       if (this.t <= 0 || Math.hypot(this.pos.x - this.target.x, this.pos.z - this.target.z) < .5){ const a = rnd() * 6.28, r = rnd() * 5; this.target.set(this.home.x + Math.cos(a) * r, 0, this.home.z + Math.sin(a) * r); this.t = 2 + rnd() * 3; }
       goal = this.target; speed = 1.4;
-      if (dist < 9 + nightK * 3 && dy < 3 && state.tut >= 2){ this.state = 'alert'; this.t = .45; m.bang.visible = true; sfx.alert(); }
+      if (dist < 6 + nightK * 2 && dy < 3 && state.tut >= 2 && !state.talking){ this.state = 'alert'; this.t = .45; m.bang.visible = true; sfx.alert(); }
     } else if (this.state === 'alert'){
       this.h += angDiff(this.h, Math.atan2(tp.x - this.pos.x, tp.z - this.pos.z)) * .3; m.body.position.y = Math.abs(Math.sin((.45 - this.t) * 14)) * .15;
       if (this.t <= 0){ this.state = 'chase'; m.bang.visible = false; m.body.position.y = 0; }
     } else if (this.state === 'chase'){
-      goal = tp; speed = 4.1 * sp;
-      if (dist > 15 || this.pos.distanceTo(this.home) > 18 || dy > 4) this.state = 'return';
+      goal = tp; speed = 3 * sp;
+      if (dist > 11 || this.pos.distanceTo(this.home) > 18 || dy > 4) this.state = 'return';
     } else if (this.state === 'return'){
       goal = this.home; speed = 2.6; if (Math.hypot(this.pos.x - this.home.x, this.pos.z - this.home.z) < 1) this.state = 'wander';
     }
@@ -1365,7 +1548,7 @@ function updateBoss(dt){
   const tp = state.driving ? state.driving.pos : P.pos, dx = tp.x - boss.pos.x, dz = tp.z - boss.pos.z, dist = Math.hypot(dx, dz);
   if (boss.state === 'intro'){ boss.vel.y -= 30 * dt; boss.pos.y += boss.vel.y * dt; if (boss.pos.y <= 0){ boss.pos.y = 0; bossLand(); boss.state = 'chase'; boss.t = 2.5; } }
   else if (boss.state === 'chase'){
-    if (dist > .5){ const sp = 3 + (3 - boss.hp) * .6; boss.pos.x += dx / dist * sp * dt; boss.pos.z += dz / dist * sp * dt; }
+    if (dist > .5){ const sp = 2.2 + (3 - boss.hp) * .4; boss.pos.x += dx / dist * sp * dt; boss.pos.z += dz / dist * sp * dt; }
     if (boss.t <= 0){ boss.state = 'windup'; boss.t = .8; tone(140, .7, 'sawtooth', .05, 120); }
   } else if (boss.state === 'windup'){
     const k = (.8 - boss.t) * .4; g.scale.set(s * (1 + k), s * (1 - k), s * (1 + k));
@@ -1373,7 +1556,7 @@ function updateBoss(dt){
     if (boss.t <= 0){ boss.state = 'jump'; boss.vel.set(dx * .9, 15, dz * .9); const l = Math.hypot(boss.vel.x, boss.vel.z); if (l > 12){ boss.vel.x *= 12 / l; boss.vel.z *= 12 / l; } }
   } else if (boss.state === 'jump'){
     boss.vel.y -= 32 * dt; boss.pos.addScaledVector(boss.vel, dt);
-    if (boss.pos.y <= 0 && boss.vel.y < 0){ boss.pos.y = 0; bossLand(); boss.state = 'stunned'; boss.t = 1.6; }
+    if (boss.pos.y <= 0 && boss.vel.y < 0){ boss.pos.y = 0; bossLand(); boss.state = 'stunned'; boss.t = 2.4; }
   } else if (boss.state === 'stunned'){
     boss.blob.material.emissive.setRGB(.1, .05, .3);
     if (boss.t <= 0){ boss.state = 'chase'; boss.t = 2.4 - (3 - boss.hp) * .4; }
@@ -1421,7 +1604,7 @@ function hurt(from){
   if (P.inv > 0 || state.done) return;
   state.hearts--; state.hurtCount++; P.inv = 1.6; sfx.hurt(); shake = .4; hitstop = .06;
   const dx = P.pos.x - from.x, dz = P.pos.z - from.z, l = Math.hypot(dx, dz) || 1;
-  P.vel.set(dx / l * 9, 8, dz / l * 9); P.grounded = false;
+  P.vel.set(dx / l * 6, 6, dz / l * 6); P.grounded = false;
   const v = $('vignette'); v.style.transition = 'none'; v.style.opacity = .9; requestAnimationFrame(() => { v.style.transition = 'opacity .6s'; v.style.opacity = 0; });
   if (state.hearts <= 0){
     toast('Burnout!', 'Omkar took a chai break. Back at the plaza with full hearts.', true);
@@ -1442,6 +1625,15 @@ function physics(dt){
   bugs.forEach(b => b.update(dt));
   updateBoss(dt);
 
+  lifts.forEach(L => { if (L.cool > 0) L.cool -= dt; });
+  if (fly.on && !state.driving){
+    fly.t = Math.min(1, fly.t + dt / fly.dur); const t = fly.t, e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, u = 1 - e;
+    P.pos.set(u*u*fly.a.x + 2*u*e*fly.ctl.x + e*e*fly.b.x, u*u*fly.a.y + 2*u*e*fly.ctl.y + e*e*fly.b.y, u*u*fly.a.z + 2*u*e*fly.ctl.z + e*e*fly.b.z);
+    P.vel.set(0, 0, 0); P.grounded = false; P.facing = Math.atan2(fly.b.x - fly.a.x, fly.b.z - fly.a.z);
+    if (Math.random() < .5) burst(P.pos.x, P.pos.y + .3, P.pos.z, 0x38c6cc, 2, 1, -1);
+    if (t >= 1){ fly.on = false; P.vel.y = 2; pickups(P.pos, 1.2); }
+    return;
+  }
   if (state.driving){
     const v = state.driving;
     P.pos.copy(v.pos); P.prev.copy(v.pos); P.vel.copy(v.vel); P.grounded = true;
@@ -1482,7 +1674,7 @@ function physics(dt){
       if (i === 0) P.pos.x = b.x0 - PLAYER_R; else if (i === 1) P.pos.x = b.x1 + PLAYER_R; else if (i === 2) P.pos.z = b.z0 - PLAYER_R; else P.pos.z = b.z1 + PLAYER_R;
     }
   }
-  for (const v of [...vehicles, { pos:rick.position, radius:1.3 }]){
+  for (const v of [...vehicles, { pos:rick.position, radius:1.3 }, ...people.map(n => ({ pos:n.pos, radius:.45 }))]){
     const ddx = P.pos.x - v.pos.x, ddz = P.pos.z - v.pos.z, d = Math.hypot(ddx, ddz), rr = v.radius + PLAYER_R;
     if (d < rr && d > 1e-3 && P.pos.y < v.pos.y + 1.4){ P.pos.x += ddx / d * (rr - d); P.pos.z += ddz / d * (rr - d); }
   }
@@ -1505,6 +1697,7 @@ function physics(dt){
   if (mag > .05 && P.grounded){ P.moved += Math.hypot(P.vel.x, P.vel.z) * dt; if (state.tut === 0 && P.moved > 5) advanceTut(); }
 
   pickups(P.pos, 1.2);
+  if (P.grounded && P.pos.y < .5) for (const L of lifts) if (L.cool <= 0 && !state.got.has(L.c.id) && Math.hypot(P.pos.x - L.x, P.pos.z - L.z) < 1.2){ startLift(L); break; }
   const rp = rick.position;
   if (P.pos.y < 1.6 && Math.hypot(P.pos.x - rp.x, P.pos.z - rp.z) < 1.8){
     const ax = P.pos.x - rp.x, az = P.pos.z - rp.z, l = Math.hypot(ax, az) || 1;
@@ -1556,6 +1749,7 @@ const joy = { x:0, y:0, id:null }; let tBoost = false;
 const KEYMAP = { KeyW:'fwd', ArrowUp:'fwd', KeyS:'back', ArrowDown:'back', KeyA:'left', ArrowLeft:'left', KeyD:'right', ArrowRight:'right', ShiftLeft:'sprint', ShiftRight:'sprint' };
 function readInput(){ return { x:(keys.right ? 1 : 0) - (keys.left ? 1 : 0) + joy.x, y:(keys.fwd ? 1 : 0) - (keys.back ? 1 : 0) + joy.y, boost:keys.sprint || tBoost, brake:keys.jump }; }
 addEventListener('keydown', e => {
+  if (state.talking){ if (e.code === 'Escape') endTalk(); else if (!e.repeat && (e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space')) nextLine(); e.preventDefault(); return; }
   if (e.code === 'Escape' || e.code === 'KeyP'){ if (!modal.hidden) closeModal(); else if (state.started) openMenu(); return; }
   if (!state.started) return;
   if (!modal.hidden){ if (e.code === 'KeyE' || e.code === 'Enter') closeModal(); return; }
@@ -1612,12 +1806,86 @@ const zoneFx = ZONES.map(z => {
   const info = new THREE.Sprite(new THREE.SpriteMaterial({ map:INFO_TEX, transparent:true, depthWrite:false, fog:false })); info.scale.set(.9, .9, 1); info.position.set(z.x, 3.4, z.z); scene.add(info);
   return { ring, info };
 });
-let activeZone = null, nearVehicle = null;
+let activeZone = null, nearVehicle = null, nearNpc = null;
+function findNpc(){ let best = null, bd = TALK_R; people.forEach(n => { const d = Math.hypot(P.pos.x - n.pos.x, P.pos.z - n.pos.z); if (d < bd && P.pos.y < 1.5){ bd = d; best = n; } }); return best; }
+const talk = { npc:null, i:0, shown:0, full:'', blipT:0 };
+function startTalk(n){
+  talk.npc = n; talk.i = 0; state.talking = n; state.paused = true;
+  Object.keys(keys).forEach(k => keys[k] = false); P.jumpHeld = false; P.vel.set(0, 0, 0);
+  const dx = n.pos.x - P.pos.x, dz = n.pos.z - P.pos.z; P.facing = Math.atan2(dx, dz); omkar.root.rotation.y = P.facing;
+  n.h = Math.atan2(-dx, -dz);
+  const mid = new THREE.Vector3((P.pos.x + n.pos.x) / 2, 1.7, (P.pos.z + n.pos.z) / 2), side = new THREE.Vector3(dz, 0, -dx).normalize();
+  if (side.dot(new THREE.Vector3(camera.position.x - mid.x, 0, camera.position.z - mid.z)) < 0) side.negate();
+  cam.override = { look:mid, pos:mid.clone().addScaledVector(side, 5.2).add(new THREE.Vector3(0, 1.1, 0)) };
+  const t = $('talk'), c = '#' + n.o.top.toString(16).padStart(6, '0');
+  t.style.setProperty('--npc', c); $('tAv').textContent = n.o.name[0]; $('tNm').textContent = n.o.name; $('tRl').textContent = n.o.role;
+  $('tDots').innerHTML = n.o.lines.map(() => '<i></i>').join('');
+  t.hidden = false; $('prompt').hidden = true; $('hint').hidden = true; mk.hidden = true; sfx.hello(n.o.pitch); showLine();
+}
+function showLine(){
+  const n = talk.npc; talk.full = n.o.lines[talk.i]; talk.shown = 0; $('tTx').textContent = '';
+  [...$('tDots').children].forEach((d, i) => d.classList.toggle('on', i <= talk.i));
+  n.talkAnim = 1.2;
+}
+function nextLine(){
+  if (!talk.npc) return;
+  if (talk.shown < talk.full.length){ talk.shown = talk.full.length; $('tTx').textContent = talk.full; return; }
+  talk.i++; sfx.tick();
+  if (talk.i >= talk.npc.o.lines.length) return endTalk();
+  showLine();
+}
+function endTalk(){
+  const n = talk.npc; if (!n) return;
+  talk.npc = null; state.talking = null; $('talk').hidden = true; $('prompt').hidden = false; $('hint').hidden = false; cam.override = null;
+  if (modal.hidden) state.paused = false;
+  if (!n.talked && talk.i >= n.o.lines.length){
+    n.talked = true; n.bub.material.map = DONE_TEX; state.chats++; updateHUD(); sfx.heal();
+    if (state.chats === NPCS.length) toast('Everyone knows Omkar', `You heard all ${NPCS.length} stories on the island`);
+    else toast(`${n.o.name} · story heard`, `${state.chats} of ${NPCS.length} people. Look for more speech bubbles.`);
+  }
+  canvas.focus();
+}
+function updateTalk(dt){
+  if (!talk.npc || talk.shown >= talk.full.length) return;
+  const before = Math.floor(talk.shown); talk.shown = Math.min(talk.full.length, talk.shown + dt * 55);
+  if (Math.floor(talk.shown) !== before){ $('tTx').textContent = talk.full.slice(0, Math.floor(talk.shown));
+    talk.blipT -= 1; if (talk.blipT <= 0 && state.sound){ talk.blipT = 3; sfx.blip(talk.npc.o.pitch); } }
+}
+$('talk').addEventListener('pointerdown', e => { e.stopPropagation(); nextLine(); });
+function updatePeople(dt){
+  for (const n of people){
+    const m = n.m, d = Math.hypot(P.pos.x - n.pos.x, P.pos.z - n.pos.z);
+    let moving = false;
+    if (talk.npc === n){ /* hold still and face Omkar */ }
+    else if (d < 7 && !state.driving){ n.h = Math.atan2(P.pos.x - n.pos.x, P.pos.z - n.pos.z); }
+    else if (!state.paused){
+      n.wt -= dt;
+      if (n.wt <= 0){ const a = rnd() * 6.28, r = rnd() * 2; n.wander.set(n.home.x + Math.cos(a) * r, 0, n.home.z + Math.sin(a) * r); n.wt = 3 + rnd() * 4; }
+      const dx = n.wander.x - n.pos.x, dz = n.wander.z - n.pos.z, l = Math.hypot(dx, dz);
+      if (l > .2){ n.pos.x += dx / l * 1.1 * dt; n.pos.z += dz / l * 1.1 * dt; n.h = Math.atan2(dx, dz); moving = true; }
+      else n.h += angDiff(n.h, n.baseH) * Math.min(1, dt * 2);
+    }
+    m.root.position.copy(n.pos); m.root.rotation.y += angDiff(m.root.rotation.y, n.h) * Math.min(1, dt * 8);
+    n.step += moving ? dt * 7 : 0; const sw = moving ? Math.sin(n.step) * .6 : 0;
+    m.legL.rotation.x = sw; m.legR.rotation.x = -sw; m.armL.rotation.x = -sw * .8; m.armR.rotation.x = sw * .8;
+    m.body.position.y = moving ? Math.abs(Math.sin(n.step)) * .05 : Math.sin(t0 * 2 + n.phase) * .015;
+    if (n.talkAnim > 0){ n.talkAnim -= dt; m.armR.rotation.x = -.4; m.armR.rotation.z = -.5 - Math.sin(t0 * 6) * .25; m.armL.rotation.z = .25; }
+    else if (!moving && d < TALK_R + 3 && !talk.npc && !n.talked){ m.armR.rotation.x = 0; m.armR.rotation.z = -2.5 + Math.sin(t0 * 10) * .3; }   // wave you over
+    else { m.armR.rotation.z = -.1; m.armL.rotation.z = .1; }
+    const speaking = talk.npc === n && talk.shown < talk.full.length;
+    m.mouth.scale.set(1, speaking ? .6 + Math.abs(Math.sin(t0 * 22)) * 1.2 : 1, 1);
+    m.head.rotation.x = talk.npc === n ? Math.sin(t0 * 3) * .04 : 0;
+    const blink = ((t0 + n.phase) % 4.1) < .12 ? .15 : 1; m.eyes.forEach(e => e.scale.y = e.userData.sy * blink);
+    n.bub.position.y = 3.35 + Math.sin(t0 * 2.5 + n.phase) * .1; n.bub.visible = talk.npc !== n;
+  }
+}
 function findZone(){ for (const z of ZONES) if (Math.hypot(P.pos.x - z.x, P.pos.z - z.z) < z.r && P.pos.y < 2) return z; return null; }
 function findVehicle(){ let best = null, bd = 3.2; vehicles.forEach(v => { const d = Math.hypot(P.pos.x - v.pos.x, P.pos.z - v.pos.z); if (d < bd && Math.abs(P.pos.y - v.pos.y) < 1.5){ bd = d; best = v; } }); return best; }
 function act(kind){
+  if (state.talking) return nextLine();
   if (state.paused) return;
   if (state.driving){ if (kind !== 'e') exitVehicle(); return; }
+  if (kind !== 'f' && nearNpc) return startTalk(nearNpc);
   if (kind !== 'f' && activeZone) return interact();
   if (nearVehicle && (kind !== 'e' || !activeZone)) return enterVehicle(nearVehicle);
 }
@@ -1668,7 +1936,8 @@ $('skip').onclick = () => { state.tut = TUT.length; try { localStorage.setItem('
 function objective(){
   if (state.tut < TUT.length) return Object.assign({ lab:`Tutorial ${state.tut + 1} of ${TUT.length}` }, TUT[state.tut]);
   const next = ORDER.find(id => !state.got.has(id));
-  if (next){ const c = CASE_BY[next]; return { lab:`Case study ${state.got.size + 1} of 7`, ttl:`Recover ${c.name}`, sub:c.how, pos:CASE_POS[next] }; }
+  if (next){ const c = CASE_BY[next], L = lifts.find(l => l.c === c);
+    return { lab:`Case study ${state.got.size + 1} of 7`, ttl:`Recover ${c.name}`, sub:`Step on the glowing <b>LIFT</b> pad under it and Omkiii flies you up. <span style="opacity:.7">Or climb: ${c.how}</span>`, pos:c.id === 'assure' ? CASE_POS[next] : [L.x, 1.6, L.z] }; }
   if (!state.bossDown){ if (!boss.active) spawnBoss(); return { lab:'Boss fight', ttl:'Defeat Scope Creep', sub:'Stomp its head 3 times. Jump over the shockwave when it lands.', pos:[boss.pos.x, boss.pos.y + 3, boss.pos.z] }; }
   if (!state.done) return { lab:'Final step', ttl:'Walk through the Gateway of India', sub:'Omkar\'s contact details are waiting on the other side.', pos:[GATE.x, 2, GATE.z] };
   return { lab:'Free roam', ttl:'Explore freely', sub:`Pixels ${state.pixels.size}/${pixels.length} · Bugs fixed ${state.bugsFixed} · Stunts ${state.stunts}` };
@@ -1703,6 +1972,7 @@ function updateMarker(o){
 /* ======================= UI ======================= */
 const modal = $('modal'), card = $('card');
 function openCard(html, accent, cls){
+  if (talk.npc) endTalk();
   card.className = 'card' + (cls ? ' ' + cls : ''); card.style.setProperty('--accent', accent || '#ffd23f');
   card.innerHTML = `<button class="x" aria-label="Close" id="closeX">×</button>` + html;
   $('closeX').onclick = closeModal;
@@ -1733,7 +2003,7 @@ const gemsEl = $('gems');
 gemsEl.innerHTML = ORDER.map(id => `<i class="gem" style="--c:${CASE_BY[id].color}" title="${CASE_BY[id].name}"></i>`).join('');
 function updateHUD(){
   [...gemsEl.children].forEach((el, i) => el.classList.toggle('on', state.got.has(ORDER[i])));
-  $('pix').textContent = `${state.pixels.size}/${pixels.length}`; $('bugs').textContent = state.bugsFixed;
+  $('pix').textContent = `${state.pixels.size}/${pixels.length}`; $('bugs').textContent = state.bugsFixed; $('chats').textContent = `${state.chats}/${NPCS.length}`;
   $('hearts').innerHTML = Array.from({ length:MAX_HEARTS }, (_, i) => `<i class="heart${i < state.hearts ? '' : ' off'}"></i>`).join('');
 }
 function fmt(t){ const m = Math.floor(t / 60), s = Math.floor(t % 60); return `${m}:${String(s).padStart(2,'0')}`; }
@@ -1758,10 +2028,11 @@ function openMenu(){
   openCard(`<span class="tag">Paused</span><h2>Menu</h2>
     <div class="ctl">
       <kbd>W A S D</kbd><span>Walk, or drive in a vehicle</span><kbd>Space</kbd><span>Jump · drift when driving</span>
-      <kbd>Shift</kbd><span>Sprint · boost when driving</span><kbd>E</kbd><span>Read a landmark</span>
+      <kbd>Shift</kbd><span>Sprint · boost when driving</span><kbd>E</kbd><span>Talk to people · read a landmark</span>
       <kbd>F</kbd><span>Get in or out of the taxi or bike</span><kbd>H</kbd><span>Horn (scares bugs off)</span>
       <kbd>N</kbd><span>Switch day / night</span><kbd>R</kbd><span>Back to the plaza</span>
     </div>
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 0">The islanders are made up, but every fact they share comes from Omkar's résumé and website. Glowing LIFT pads fly you up to each crystal.</p>
     <div class="opts">
       <button id="mResume">Resume <span>Esc</span></button>
       <button id="mResume2">Résumé view <span>Q</span></button>
@@ -1839,6 +2110,7 @@ function drawMini(o){
   mg.strokeStyle = '#4a4458'; mg.lineWidth = 4 * s; mg.beginPath(); mg.arc(X(0), Z(0), 26 * s, 0, 7); mg.stroke();
   mg.fillStyle = 'rgba(255,210,63,.9)'; ZONES.forEach(z => { mg.beginPath(); mg.arc(X(z.x), Z(z.z), 4, 0, 7); mg.fill(); });
   gems.forEach(g => { if (state.got.has(g.c.id)) return; mg.save(); mg.translate(X(g.m.position.x), Z(g.m.position.z)); mg.rotate(Math.PI/4); mg.fillStyle = g.c.color; mg.fillRect(-6,-6,12,12); mg.strokeStyle = '#13102a'; mg.lineWidth = 2; mg.strokeRect(-6,-6,12,12); mg.restore(); });
+  people.forEach(n => { mg.fillStyle = n.talked ? 'rgba(91,224,138,.7)' : '#ffffff'; mg.strokeStyle = '#13102a'; mg.lineWidth = 1.5; mg.beginPath(); mg.arc(X(n.pos.x), Z(n.pos.z), 4.2, 0, 7); mg.fill(); mg.stroke(); });
   mg.fillStyle = '#ff4d5e'; bugs.forEach(b => { if (b.dead <= 0){ mg.beginPath(); mg.arc(X(b.pos.x), Z(b.pos.z), 3.4, 0, 7); mg.fill(); } });
   if (boss.active){ mg.fillStyle = '#9d8cff'; mg.beginPath(); mg.arc(X(boss.pos.x), Z(boss.pos.z), 9, 0, 7); mg.fill(); }
   vehicles.forEach(v => { if (state.driving === v) return; mg.fillStyle = v.kind === 'taxi' ? '#ffcf2e' : '#c9485a'; mg.fillRect(X(v.pos.x) - 5, Z(v.pos.z) - 5, 10, 10); });
@@ -1857,11 +2129,14 @@ function pickHint(){
   if (!state.driving && bugs.some(b => b.dead <= 0 && b.state === 'chase')) return 'A bug is chasing you! Jump on top of it to fix it.';
   if (state.hearts === 1) return 'Low on hearts. Grab a cutting chai or a vada pav.';
   if (state.driving) return state.driving.boosting ? 'Boooost!' : 'Try the orange stunt ramp east of the plaza. Run over bugs for easy fixes.';
+  if (fly.on) return 'Wheee! Hold tight, flying you to the crystal.';
+  if (nearNpc) return `${nearNpc.o.name} knows Omkar. Press E to chat.`;
   if (activeZone) return 'Press E to read about this place.';
   if (nearVehicle) return `Press F to ride the ${nearVehicle.name}.`;
   if (state.boost > 0) return 'Vada pav power! 45% faster for a bit.';
   if (nightK > .6) return 'Bugs love the dark. They move faster at night.';
-  return state.tut < TUT.length ? 'I am Omkiii, Omkar\'s AI sidekick. Follow the steps at the top.' : 'Follow the yellow diamond. Each beam of light is a case study.';
+  if (state.tut >= TUT.length && state.chats < 3 && (t0 % 40) < 12) return 'People with a speech bubble have stories about Omkar. Go and say hi!';
+  return state.tut < TUT.length ? 'I am Omkiii, Omkar\'s AI sidekick. Follow the steps at the top.' : 'Follow the yellow diamond to a LIFT pad. It flies you to the crystal.';
 }
 
 /* ======================= LOOP ======================= */
@@ -1933,6 +2208,8 @@ function frame(now){
   stuntRing.rotation.x += dt * 1.5;
   if (fireworksUntil > now && Math.random() < dt * 6){ burst(GATE.x + (Math.random()-.5) * 18, 14 + Math.random() * 9, GATE.z + (Math.random()-.5) * 6, [0xffd23f,0xff8a3d,0x38c6cc,0xff7ab8,0x5be08a][Math.floor(Math.random()*5)], 80, 9, 2); sfx.pop(); }
   updateParticles(dt);
+  updatePeople(dt); updateTalk(dt);
+  lifts.forEach((L, i) => { const on = !state.got.has(L.c.id); L.g.visible = on; if (on){ L.arr.position.y = .16 + (t0 * .6 + i * .3) % 1 * .01; L.arr.rotation.z = 0; L.arr.material.opacity = .55 + Math.sin(t0 * 5 + i) * .35; L.col.material.opacity = .14 + Math.sin(t0 * 3 + i) * .08; L.lab.position.y = 4.4 + Math.sin(t0 * 2 + i) * .12; } });
   LAMPS.map(l => [l, l.distanceToSquared(rp)]).sort((a, b) => a[1] - b[1]).slice(0, 4).forEach(([l], i) => lit.lampLights[i].position.copy(l));
 
   updateCamera(dt, rp, now);
@@ -1943,14 +2220,15 @@ function frame(now){
   updateSky();
 
   if (state.started){
-    if (!state.paused){ activeZone = state.driving ? null : findZone(); nearVehicle = state.driving ? null : findVehicle(); }
+    if (!state.paused){ activeZone = state.driving || fly.on ? null : findZone(); nearVehicle = state.driving || fly.on ? null : findVehicle(); nearNpc = state.driving || fly.on ? null : findNpc(); }
     const pr = $('prompt'); let html = '';
     if (modal.hidden && !cam.override){
-      if (activeZone) html += `<button class="pr" data-k="e"><kbd>E</kbd>${activeZone.id === 'photo' ? 'Take a selfie with Omkar' : 'Read: ' + SPOTS[activeZone.id].label}</button>`;
+      if (nearNpc) html += `<button class="pr" data-k="e"><kbd>E</kbd>Talk to ${nearNpc.o.name}</button>`;
+      else if (activeZone) html += `<button class="pr" data-k="e"><kbd>E</kbd>${activeZone.id === 'photo' ? 'Take a selfie with Omkar' : 'Read: ' + SPOTS[activeZone.id].label}</button>`;
       if (nearVehicle) html += `<button class="pr alt" data-k="f"><kbd>F</kbd>Ride the ${nearVehicle.name}</button>`;
     }
     if (pr.dataset.h !== html){ pr.dataset.h = html; pr.innerHTML = html; pr.querySelectorAll('.pr').forEach(b => b.onclick = () => act(b.dataset.k)); }
-    const ta = state.driving ? 'EXIT' : nearVehicle && !activeZone ? 'RIDE' : 'ACT'; if (ta !== lastTact){ lastTact = ta; $('tact').textContent = ta; }
+    const ta = state.driving ? 'EXIT' : nearNpc ? 'TALK' : nearVehicle && !activeZone ? 'RIDE' : 'ACT'; if (ta !== lastTact){ lastTact = ta; $('tact').textContent = ta; }
     $('clock').textContent = fmt(state.time);
     if (state.driving){ $('kmh').textContent = Math.round(Math.abs(state.driving.speed) * 4.2); $('boostFill').style.transform = `scaleX(${state.driving.boost})`; }
     const ob = updateObjective(); updateMarker(ob);
@@ -1978,6 +2256,5 @@ Promise.race([
   new Promise(r => setTimeout(r, 2500))
 ]).catch(() => {}).then(main);
 </script>
-
 </body>
 </html>
