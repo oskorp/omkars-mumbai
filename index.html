@@ -42,7 +42,7 @@ kbd{font:500 11px var(--f-mono);color:var(--ink);background:var(--night-2);borde
 #who .wstat{font:500 11px var(--f-mono);color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
 #who .wstat b{color:var(--rick);font-weight:500}
 
-#obj{top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(520px,calc(100vw - 420px));min-width:260px;padding:10px 16px;display:grid;gap:4px;text-align:center}
+#obj{box-sizing:border-box;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(520px,calc(100vw - 420px));min-width:260px;padding:10px 16px;display:grid;gap:4px;text-align:center}
 #obj .lab{font:600 10px var(--f-mono);letter-spacing:.16em;color:var(--rick);text-transform:uppercase;display:flex;justify-content:center;gap:10px;align-items:center}
 #obj .ttl{font:800 15px/1.25 var(--f-display);text-wrap:balance}
 #obj .sub{font-size:13px;color:var(--muted);line-height:1.45}
@@ -67,12 +67,14 @@ kbd{font:500 11px var(--f-mono);color:var(--ink);background:var(--night-2);borde
 .chip:hover{border-color:var(--rick)}
 .chip.off{opacity:.5;text-decoration:line-through}
 
-#talk{left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 32px));pointer-events:auto;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:14px 16px 12px;border-radius:18px;border:2px solid var(--npc,var(--rick));animation:tin .3s cubic-bezier(.2,1.4,.4,1) both}
+#talk{left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 32px));pointer-events:auto;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:14px 16px 12px;border-radius:18px;border:2px solid var(--npc,var(--rick));box-sizing:border-box;animation:talkin .3s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes talkin{from{opacity:0;transform:translate(-50%,14px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
 #talk .av{width:52px;height:52px;border-radius:50%;background:var(--npc,var(--rick));display:grid;place-items:center;font:800 22px var(--f-display);color:#13102a;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
 #talk .nm{font:800 15px var(--f-display);color:var(--npc,var(--rick))}
 #talk .rl{font:500 11px var(--f-mono);letter-spacing:.06em;color:var(--muted);margin:2px 0 8px}
 #talk .tx{font-size:16px;line-height:1.5;min-height:48px;color:var(--ink)}
 #talk .ft{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}
+#talk .ft .tp{display:none}body.compact #talk .ft .tp{display:inline}
 #talk .dots{display:flex;gap:5px}#talk .dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}#talk .dots i.on{background:var(--npc,var(--rick))}
 #prompt{left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:6px;justify-items:center}
 .pr{background:var(--rick);color:#1a1400;border-radius:999px;padding:8px 16px 8px 8px;font:800 14px var(--f-body);display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(255,210,63,.35);white-space:nowrap;border:0}
@@ -200,6 +202,53 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
   .card{padding:22px 18px 18px}
   #who .wstat{display:none}
 }
+/* Phones: one calm top bar, objective collapses to a single line, hints fade away */
+body.compact #who{padding:6px 10px 6px 6px;gap:8px}
+body.compact #who img{width:36px;height:36px}
+body.compact #who .nm{font-size:11px}
+body.compact #who .wstat{display:none}
+body.compact #topright{display:flex;flex-direction:row-reverse;align-items:flex-start;gap:8px}
+body.compact #mini{width:72px;height:72px}
+body.compact #bDay,body.compact #bMusic,body.compact #bSound{display:none}
+body.compact .btnrow{max-width:none}
+body.compact #bMenu{width:40px;height:40px;padding:0;justify-content:center;font-size:18px;border-radius:12px}
+body.compact #obj{top:calc(92px + env(safe-area-inset-top,0px));width:calc(100vw - 24px);min-width:0;padding:8px 12px;gap:2px;pointer-events:auto;cursor:pointer}
+body.compact #obj .ttl{font-size:13px}
+body.compact #obj .sub{font-size:12px}
+body.compact #obj.mini .sub,body.compact #obj.mini #gems{display:none}
+body.compact #obj.mini .lab::after{content:"tap for help";color:var(--muted);letter-spacing:.06em;text-transform:none}
+body.compact #toasts{top:calc(158px + env(safe-area-inset-top,0px))}
+body.compact .toast{padding:6px 12px}
+body.compact .toast span{font-size:11px}
+body.compact #hint{max-width:min(260px,64vw);transition:opacity .4s,transform .4s}
+body.compact #hint.gone{opacity:0;transform:translateY(8px)}
+body.compact #hint .bot{width:30px;height:30px}
+body.compact #hint .bot::before{left:5px;right:5px;top:10px;height:9px}
+body.compact #hint .bot::after{left:9px;top:12px;width:3px;height:4px;box-shadow:9px 0 0 var(--sea)}
+body.compact #hint .bubble{font-size:12px;padding:6px 10px}
+body.compact .pr kbd{display:none}
+body.compact .pr{padding:10px 18px}
+body.compact #drive .keys{display:none}
+body.compact #drive{min-width:0;padding:8px 12px}
+body.compact #drive .spd{font-size:24px}
+body.compact #talk .ft span.k{display:none}
+body.compact #talk .tx{font-size:15px}
+body.compact #marker .d{font-size:10px}
+.touchline{display:none}
+body.compact .touchline{display:block;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5}
+body.compact .menu .ctl{display:none}
+@media (max-width:700px){
+  .start-card > div:first-child{display:flex;flex-direction:column}
+  .start-card .cta{order:3;margin-bottom:16px}
+  .start-card .how{order:4;grid-template-columns:1fr 1fr;gap:8px}
+  .start-card .how div{padding:10px;font-size:12px}
+  .start-card .how i{font-size:16px}
+  .start-card .how b{font-size:12px}
+  .start-card h1{font-size:46px}
+  .lede{font-size:14px;margin:10px 0 14px}
+  .play{flex:1 1 100%}
+  .cta .alt{flex:1 1 100%}
+}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
 </style>
 
@@ -224,12 +273,12 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
     <button class="chip" id="bDay" title="Day / night (N)">Night</button>
     <button class="chip" id="bMusic" title="Music">Music</button>
     <button class="chip" id="bSound" title="Sound (M)">Sound</button>
-    <button class="chip" id="bMenu" title="Menu (Esc)">Menu</button>
+    <button class="chip" id="bMenu" title="Menu (Esc)" aria-label="Menu">Menu</button>
   </div>
 </div>
 <div class="hud" id="toasts"></div>
 <div class="hud" id="prompt"></div>
-<div class="hud panel" id="talk" hidden role="dialog" aria-live="polite"><div class="av" id="tAv"></div><div><div class="nm" id="tNm"></div><div class="rl" id="tRl"></div><div class="tx" id="tTx"></div><div class="ft"><div class="dots" id="tDots"></div><span><kbd>E</kbd> / tap next · <kbd>Esc</kbd> leave</span></div></div></div>
+<div class="hud panel" id="talk" hidden role="dialog" aria-live="polite"><div class="av" id="tAv"></div><div><div class="nm" id="tNm"></div><div class="rl" id="tRl"></div><div class="tx" id="tTx"></div><div class="ft"><div class="dots" id="tDots"></div><span class="k"><kbd>E</kbd> / tap next · <kbd>Esc</kbd> leave</span><span class="tp">Tap to continue</span></div></div></div>
 <div class="hud panel" id="drive" hidden>
   <div class="spd"><span id="kmh">0</span><small>KM/H</small></div>
   <div id="boostbar"><i id="boostFill"></i></div>
@@ -249,7 +298,7 @@ body.touch #prompt{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
       <div class="how">
         <div><i>1</i><b>Follow the marker</b>The yellow diamond always shows where to go next.</div>
         <div><i>2</i><b>Lift up</b>Step on the glowing pad under a crystal. You fly straight to it.</div>
-        <div><i>3</i><b>Talk to people</b>Anyone with a speech bubble has a story about Omkar. Press E.</div>
+        <div><i>3</i><b>Talk to people</b>Anyone with a speech bubble has a story about Omkar. Walk up and say hi.</div>
         <div><i>4</i><b>Drive & stomp</b>Take the taxi or the bike. Jump on bugs to fix them.</div>
       </div>
       <div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Space</kbd> jump</span><span><kbd>Shift</kbd> sprint</span><span><kbd>E</kbd> talk / read</span><span><kbd>F</kbd> drive</span><span><kbd>Drag</kbd> look</span><span><kbd>Esc</kbd> menu</span></div>
@@ -286,6 +335,8 @@ const ISLET = { x:91, z:-2, r:7 };
 const DAY_LENGTH = 300;          // seconds for a full day/night cycle
 const MAX_HEARTS = 5;
 const IS_TOUCH = matchMedia('(pointer:coarse)').matches;
+const isCompact = () => IS_TOUCH || innerWidth < 700;
+const TAP = (key, btn) => IS_TOUCH ? `tap <b>${btn}</b>` : `press <kbd>${key}</kbd>`;
 
 /* ======================= CONTENT ======================= */
 const LINKS = {
@@ -1111,7 +1162,7 @@ function buildOmkar(){
     m.scale.setScalar(s); m.castShadow = false;
   }
   [[-.2,.3,.33],[-.08,.34,.35],[.05,.33,.36],[.17,.3,.34],[.27,.25,.3],[-.29,.24,.29],[0,.44,.3],[.12,.45,.28],[-.13,.45,.28]].forEach(([x,y,z]) => { const m = mesh(curlGeo, r2() > .6 ? hairTip : hairM, x, y, z, head); m.scale.setScalar(.085); m.castShadow = false; });
-  const tag = labelSprite('OMKAR', { size:1.4 }); tag.position.y = 2.95; root.add(tag);
+  const tag = labelSprite('OMKAR', { size:1.4 }); tag.position.y = 2.95; tag.visible = !isCompact(); root.add(tag);
   return { root, body, legL, legR, armL, armR, head, torso, eyes };
 }
 const omkar = buildOmkar(); scene.add(omkar.root);
@@ -1777,6 +1828,8 @@ canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointerc
 canvas.addEventListener('wheel', e => { cam.dist = clamp(cam.dist + e.deltaY * .01, 4.5, 18); e.preventDefault(); }, { passive:false });
 const joyEl = $('joy'), knob = $('knob');
 if (IS_TOUCH){ $('touch').classList.add('on'); document.body.classList.add('touch'); }
+const setCompact = () => { document.body.classList.toggle('compact', isCompact()); $('bMenu').textContent = isCompact() ? '☰' : 'Menu'; };
+setCompact(); addEventListener('resize', setCompact);
 joyEl.addEventListener('pointerdown', e => { joy.id = e.pointerId; joyEl.setPointerCapture(e.pointerId); moveJoy(e); });
 joyEl.addEventListener('pointermove', e => { if (e.pointerId === joy.id) moveJoy(e); });
 const endJoy = e => { if (e.pointerId !== joy.id) return; joy.id = null; joy.x = joy.y = 0; knob.style.transform = ''; };
@@ -1894,7 +1947,7 @@ function enterVehicle(v){
   omkar.root.scale.setScalar(v.model.scale);
   $('drive').hidden = false; $('tboost').hidden = false; $('tjump').textContent = 'DRIFT';
   if (state.tut === 3) advanceTut();
-  if (!state.drove){ state.drove = true; toast(`Riding the ${v.name}`, 'W/S throttle · A/D steer · Shift boost · F to get out'); }
+  if (!state.drove){ state.drove = true; toast(`Riding the ${v.name}`, IS_TOUCH ? 'Joystick to drive · BOOST to go fast · EXIT to get out' : 'W/S throttle · A/D steer · Shift boost · F to get out'); }
 }
 function exitVehicle(){
   const v = state.driving; if (!v) return;
@@ -1923,10 +1976,10 @@ function interact(){
 
 /* ======================= OBJECTIVES / TUTORIAL ======================= */
 const TUT = [
-  { ttl:'Walk around', sub:'Use <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the joystick. Drag the screen to look around.' },
-  { ttl:'Jump', sub:'Press <kbd>Space</kbd>. Hold it to jump higher.' },
-  { ttl:'Meet Omkar', sub:'Walk into the glowing ring at the billboard and press <kbd>E</kbd>.', pos:[0, 2.5, -1] },
-  { ttl:'Take the taxi', sub:'Walk up to the yellow-and-black taxi and press <kbd>F</kbd>. The bike works too.', pos:[6, 2.5, 15] },
+  { ttl:'Walk around', sub: IS_TOUCH ? 'Drag the joystick at the bottom left. Swipe the screen to look around.' : 'Use <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>. Drag the screen to look around.' },
+  { ttl:'Jump', sub: IS_TOUCH ? 'Tap <b>JUMP</b>. Hold it to jump higher.' : 'Press <kbd>Space</kbd>. Hold it to jump higher.' },
+  { ttl:'Meet Omkar', sub:`Walk into the glowing ring at the billboard and ${TAP('E', 'ACT')}.`, pos:[0, 2.5, -1] },
+  { ttl:'Take the taxi', sub:`Walk up to the yellow-and-black taxi and ${TAP('F', 'RIDE')}. The bike works too.`, pos:[6, 2.5, 15] },
 ];
 function advanceTut(){
   state.tut++; sfx.stunt(); const o = $('obj'); o.classList.remove('pulse'); void o.offsetWidth; o.classList.add('pulse');
@@ -1942,10 +1995,12 @@ function objective(){
   if (!state.done) return { lab:'Final step', ttl:'Walk through the Gateway of India', sub:'Omkar\'s contact details are waiting on the other side.', pos:[GATE.x, 2, GATE.z] };
   return { lab:'Free roam', ttl:'Explore freely', sub:`Pixels ${state.pixels.size}/${pixels.length} · Bugs fixed ${state.bugsFixed} · Stunts ${state.stunts}` };
 }
-let lastObjKey = '';
+let lastObjKey = '', objOpenT = 8;
+$('obj').addEventListener('pointerdown', e => { e.stopPropagation(); objOpenT = $('obj').classList.contains('mini') ? 8 : 0; });
 function updateObjective(){
   const o = objective(), key = o.lab + o.ttl + o.sub;
-  if (key !== lastObjKey){ lastObjKey = key; $('objLab').textContent = o.lab; $('objTtl').textContent = o.ttl; $('objSub').innerHTML = o.sub; $('skip').hidden = state.tut >= TUT.length; }
+  $('obj').classList.toggle('mini', document.body.classList.contains('compact') && state.tut >= TUT.length && objOpenT <= 0);
+  if (key !== lastObjKey){ lastObjKey = key; objOpenT = 8; $('objLab').textContent = o.lab; $('objTtl').textContent = o.ttl; $('objSub').innerHTML = o.sub; $('skip').hidden = state.tut >= TUT.length; }
   return o;
 }
 const mk = $('marker'), mv = new THREE.Vector3();
@@ -2032,14 +2087,19 @@ function openMenu(){
       <kbd>F</kbd><span>Get in or out of the taxi or bike</span><kbd>H</kbd><span>Horn (scares bugs off)</span>
       <kbd>N</kbd><span>Switch day / night</span><kbd>R</kbd><span>Back to the plaza</span>
     </div>
+    <p class="touchline"><b>Joystick</b> to walk or drive · <b>JUMP</b> to jump · <b>ACT</b> to talk, read or ride · swipe to look around.</p>
     <p style="font-size:13px;color:var(--muted);margin:10px 0 0">The islanders are made up, but every fact they share comes from Omkar's résumé and website. Glowing LIFT pads fly you up to each crystal.</p>
     <div class="opts">
       <button id="mResume">Resume <span>Esc</span></button>
+      <button id="mDay">${nightK > .5 ? 'Switch to day' : 'Switch to night'} <span>N</span></button>
+      <button id="mSnd">Sound and music <span>${state.sound ? 'On' : 'Off'}</span></button>
       <button id="mResume2">Résumé view <span>Q</span></button>
       <button id="mQual">Graphics <span>${state.quality === 'high' ? 'High · bloom on' : 'Low · faster'}</span></button>
       <button id="mTut">Replay tutorial <span>4 steps</span></button>
     </div>`, '#ffd23f', 'menu');
   $('mResume').onclick = closeModal; $('mResume2').onclick = openResume;
+  $('mDay').onclick = () => { toggleDay(); closeModal(); };
+  $('mSnd').onclick = () => { toggleSound(); if (state.music !== state.sound) toggleMusic(); openMenu(); };
   $('mQual').onclick = () => { state.quality = state.quality === 'high' ? 'low' : 'high'; setupQuality(); openMenu(); };
   $('mTut').onclick = () => { state.tut = 0; P.moved = 0; closeModal(); };
 }
@@ -2122,7 +2182,7 @@ function drawMini(o){
 }
 
 /* ======================= OMKIII QUIPS ======================= */
-let hintT = 0, lastHint = '';
+let hintT = 0, lastHint = '', hintShowT = 5;
 function pickHint(){
   if (state.done) return 'You did it. Omkar would love to hear from you.';
   if (boss.active) return boss.state === 'windup' ? 'It is crouching. Jump the shockwave when it lands!' : boss.state === 'stunned' ? 'It is dizzy. Jump on its head now!' : 'Wait for the slam, jump the wave, then stomp it.';
@@ -2130,9 +2190,9 @@ function pickHint(){
   if (state.hearts === 1) return 'Low on hearts. Grab a cutting chai or a vada pav.';
   if (state.driving) return state.driving.boosting ? 'Boooost!' : 'Try the orange stunt ramp east of the plaza. Run over bugs for easy fixes.';
   if (fly.on) return 'Wheee! Hold tight, flying you to the crystal.';
-  if (nearNpc) return `${nearNpc.o.name} knows Omkar. Press E to chat.`;
-  if (activeZone) return 'Press E to read about this place.';
-  if (nearVehicle) return `Press F to ride the ${nearVehicle.name}.`;
+  if (nearNpc) return `${nearNpc.o.name} knows Omkar. ${IS_TOUCH ? 'Tap TALK' : 'Press E'} to chat.`;
+  if (activeZone) return `${IS_TOUCH ? 'Tap ACT' : 'Press E'} to read about this place.`;
+  if (nearVehicle) return `${IS_TOUCH ? 'Tap RIDE' : 'Press F'} to ride the ${nearVehicle.name}.`;
   if (state.boost > 0) return 'Vada pav power! 45% faster for a bit.';
   if (nightK > .6) return 'Bugs love the dark. They move faster at night.';
   if (state.tut >= TUT.length && state.chats < 3 && (t0 % 40) < 12) return 'People with a speech bubble have stories about Omkar. Go and say hi!';
@@ -2232,7 +2292,8 @@ function frame(now){
     $('clock').textContent = fmt(state.time);
     if (state.driving){ $('kmh').textContent = Math.round(Math.abs(state.driving.speed) * 4.2); $('boostFill').style.transform = `scaleX(${state.driving.boost})`; }
     const ob = updateObjective(); updateMarker(ob);
-    hintT -= dt; if (hintT <= 0){ hintT = .4; const h = pickHint(); if (h !== lastHint){ lastHint = h; $('hintText').textContent = h; } }
+    hintT -= dt; if (hintT <= 0){ hintT = .4; const h = pickHint(); if (h !== lastHint){ lastHint = h; $('hintText').textContent = h; hintShowT = 5; } }
+    hintShowT -= dt; objOpenT -= dt; $('hint').classList.toggle('gone', hintShowT <= 0 && document.body.classList.contains('compact'));
     drawMini(ob);
   } else cam.yaw += dt * .06;
   render();
